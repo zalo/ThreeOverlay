@@ -18,13 +18,19 @@ export default class Main {
         this.deferredConstructor();
     }
     async deferredConstructor() {
+        // Construct the render world
+        this.world = new World(this);
+
         // Configure Settings
         this.overlayParams = {
-            renderingMode: 2
+            renderingMode: this.world.renderingMode,
+            positioningMode: this.world.positioningMode,
         };
         this.gui = new GUI();
         this.gui.add( this.overlayParams, 'renderingMode', { Background: 0, Foreground: 1, ForegroundAndBackground: 2 } )
             .onFinishChange((value) => { this.world.renderingMode = value; });
+        this.gui.add( this.overlayParams, 'positioningMode', { Fixed: 0, Absolute: 1 } )
+            .onFinishChange((value) => { this.world.positioningMode = value; });
         //this.gui.add(this.overlayParams, 'RemeshResolution', 0, 50, 1).onFinishChange((value) => {
         //    if(this.mesh){ this.generateTetMesh(this.mesh); }});
         //this.gui.add(this.overlayParams, 'TargetTriangles', 100, 5000, 100).onFinishChange((value) => {
@@ -33,9 +39,6 @@ export default class Main {
         //    if(this.mesh){ this.generateTetMesh(this.mesh); }});
         //this.gui.add(this.overlayParams, 'MinTetVolume').onFinishChange((value) => {
         //    if(this.mesh){ this.generateTetMesh(this.mesh); }});
-
-        // Construct the render world
-        this.world = new World(this);
 
         this.cube = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshPhysicalMaterial({ color: 0x00ff00, wireframe: false }));
         this.cube.position.set(0.0, -5.0, 0.0);

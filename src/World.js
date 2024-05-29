@@ -4,10 +4,7 @@ import Stats from '../node_modules/three/examples/jsm/libs/stats.module.js';
 /** The fundamental set up and animation structures for 3D Visualization */
 export default class World {
 
-    constructor(mainObject) { this._setupWorld(mainObject); }
-
-    /** **INTERNAL**: Set up a basic world */
-    _setupWorld(mainObject) {
+    constructor(mainObject) {
         this.container_bg = document.getElementById('appbody-bg');
         this.container_fg = document.getElementById('appbody-fg');
         
@@ -61,13 +58,13 @@ export default class World {
 
         // renderer
         this.renderer_bg = new THREE.WebGLRenderer( { antialias: true } ); //, alpha: true
-        this.renderer_bg.setPixelRatio(window.devicePixelRatio > 1.5 ? 0.5 : 1.0);
+        this.renderer_bg.setPixelRatio(1.0);//window.devicePixelRatio > 1.5 ? 1.0 : 1.0);
         this.renderer_bg.shadowMap.enabled = true;
         this.renderer_bg.setAnimationLoop(mainObject.update.bind(mainObject));
         this.renderer_bg.setClearColor( 0x000000, 0 ); // the default
 
         this.renderer_fg = new THREE.WebGLRenderer( { antialias: true } ); //, alpha: true
-        this.renderer_fg.setPixelRatio(window.devicePixelRatio > 1.5 ? 0.5 : 1.0);
+        this.renderer_fg.setPixelRatio(1.0);//window.devicePixelRatio > 1.5 ? 1.0 : 1.0);
         this.renderer_fg.shadowMap.enabled = true;
         //this.renderer_fg.setAnimationLoop(mainObject.update.bind(mainObject));
         this.renderer_fg.setClearColor( 0x000000, 0 ); // the default
@@ -83,10 +80,22 @@ export default class World {
         this.raycaster = new THREE.Raycaster();
         this.raycaster.layers.set(0);
 
+        //let iOS = [
+        //    'iPad Simulator',
+        //    'iPhone Simulator',
+        //    'iPod Simulator',
+        //    'iPad',
+        //    'iPhone',
+        //    'iPod'
+        //  ].includes(navigator.platform)
+        //  // iPad on iOS 13 detection
+        //  || (navigator.userAgent.includes("Mac") && "ontouchend" in document);
+
         // Enqueue Scroll Events, since sometimes multiple scroll events are fired in a single frame
         this.scrollQueue = [];
         this.curScrollY = window.scrollY;
-        window.addEventListener("scroll", (event) => { this.scrollQueue.unshift(window.scrollY); });
+        this.positioningMode = 1;//iOS ? 1 : 0; // 0 is Fixed, 1 is Absolute
+        //window.addEventListener("scroll", (event) => { this.scrollQueue.unshift(window.scrollY); });
 
         // stats
         //this.stats = new Stats();
@@ -96,10 +105,11 @@ export default class World {
         this.elementMaterial = new THREE.MeshPhysicalMaterial({ color: 0xffffff, wireframe: true, opacity: 0.05, transparent: true});
 
         this.elementBoxes = [];
-        //this._recomputeElementBoxes();
+        this._recomputeElementBoxes();
 
         this.camera.position.set(0.0, -(this.curScrollY + (window.innerHeight * 0.5)) / this.pixelsPerMeter, 5.0);
     }
+
 
     _render() {
         if(this.renderingMode  == 2){
@@ -128,11 +138,22 @@ export default class World {
 
     _setScroll(){
         if(this.scrollQueue){
-            if(this.scrollQueue.length > 0) {
-                this.curScrollY = this.scrollQueue.pop();
+            //if(this.scrollQueue.length > 0) {
+                this.curScrollY = window.scrollY;//this.scrollQueue.pop();
                 this.camera.position.set(0.0, -(this.curScrollY + (window.innerHeight * 0.5)) / this.pixelsPerMeter, 5.0);
-            }
+            //}
             this._render(this.scene, this.camera);
+            if(this.positioningMode == 1){
+                this.container_bg.style.position = "absolute";
+                this.container_fg.style.position = "absolute";
+                this.container_bg.style.top = this.curScrollY + "px";
+                this.container_fg.style.top = this.curScrollY + "px";
+            }else{
+                this.container_bg.style.position = "fixed";
+                this.container_fg.style.position = "fixed";
+                this.container_bg.style.top = "0";
+                this.container_fg.style.top = "0";
+            }
         }
     }
 
@@ -181,7 +202,7 @@ export default class World {
             this.lastWidth  = width;
             this.lastHeight = height;
             this._recomputePixelsPerMeter();
-            //this._recomputeElementBoxes();
+            this._recomputeElementBoxes();
         }
         this._setScroll();
     }

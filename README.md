@@ -9,9 +9,7 @@
       <img src="https://img.shields.io/github/license/zalo/ThreeOverlay" title="License: Apache V2"></a>-->  <!-- No idea what license this should be! -->
 </p>
 
-Generate Tetrahedral FEM Meshes in your browser using [physx-js-webidl](https://github.com/fabmax/physx-js-webidl/)!
-
-This project is largely a toy/proof of concept; meant to explore TetMesh Generation in the browser for https://github.com/zalo/TetSim/
+WIP Framework for Rendering 3D Content Inline with Normal Text Content
 
  # Building
 
@@ -23,6 +21,5 @@ npm run build
 After building, make sure to edit the index .html to point from `"./src/main.js"` to `"./build/main.js"`.
 
  # Dependencies
- - [physx-js-webidl](https://github.com/fabmax/physx-js-webidl/) (Tetrahedral Meshing Backend)
  - [three.js](https://github.com/mrdoob/three.js/) (3D Rendering Engine)
  - [esbuild](https://github.com/evanw/esbuild/) (Bundler)

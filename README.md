@@ -1,4 +1,4 @@
-# [ThreeOverlay](https://zalo.github.io/ThreeOverlay/)
+# [ThreeOverlay - WIP](https://zalo.github.io/ThreeOverlay/)
 
 <p align="left">
   <a href="https://github.com/zalo/ThreeOverlay/deployments/activity_log?environment=github-pages">
@@ -9,7 +9,7 @@
       <img src="https://img.shields.io/github/license/zalo/ThreeOverlay" title="License: Apache V2"></a>-->  <!-- No idea what license this should be! -->
 </p>
 
-WIP Framework for Rendering 3D Content Inline with Normal Text Content
+Framework for Rendering 3D Content Inline with Normal Text Content for a more whimsical internet.
 
  # Building
 

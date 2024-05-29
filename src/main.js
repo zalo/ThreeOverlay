@@ -43,9 +43,8 @@ export default class Main {
     }
 
     /** Update the simulation */
-    update() {
-        if(this.world.alreadyRendered){ this.world.alreadyRendered = false; return; }
-        this.world._setScroll(false);
+    update(timeMS) {
+        this.world._setScroll(timeMS);
         this.world.stats.update();
     }
 

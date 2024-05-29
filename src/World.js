@@ -99,10 +99,10 @@ export default class World {
         this.raycaster = new THREE.Raycaster();
         this.raycaster.layers.set(0);
 
-        this.alreadyRendered = false;
-        window.addEventListener("scroll", (event) => {
-            this._setScroll();
-        });
+        // Enqueue Scroll Events, since sometimes multiple scroll events are fired in a single frame
+        this.scrollQueue = [];
+        this.curScrollY = window.scrollY;
+        window.addEventListener("scroll", (event) => { this.scrollQueue.unshift(window.scrollY); });
 
         // stats
         this.stats = new Stats();
@@ -140,10 +140,14 @@ export default class World {
         }
     }
 
-    _setScroll(interruption = true){
-        this.camera.position.set(0.0, -(window.scrollY + (window.innerHeight *0.5)) / this.pixelsPerMeter, 5.0);
-        this._render(this.scene, this.camera);
-        this.alreadyRendered = interruption;
+    _setScroll(){
+        if(this.scrollQueue){
+            if(this.scrollQueue.length > 0) {
+                this.curScrollY = this.scrollQueue.pop();
+                this.camera.position.set(0.0, -(this.curScrollY + (window.innerHeight * 0.5)) / this.pixelsPerMeter, 5.0);
+            }
+            this._render(this.scene, this.camera);
+        }
     }
 
     _recomputeElementBoxes(){

@@ -146,13 +146,13 @@ export default class World {
             if(this.positioningMode == 1){
                 this.container_bg.style.position = "absolute";
                 this.container_fg.style.position = "absolute";
-                this.container_bg.style.top = this.curScrollY + "px";
-                this.container_fg.style.top = this.curScrollY + "px";
+                this.container_bg.style.transform = "translate(0px, "+this.curScrollY+"px)";
+                this.container_fg.style.transform = "translate(0px, "+this.curScrollY+"px)";
             }else{
                 this.container_bg.style.position = "fixed";
                 this.container_fg.style.position = "fixed";
-                this.container_bg.style.top = "0";
-                this.container_fg.style.top = "0";
+                this.container_bg.style.transform = "translate(0px, 0px)";
+                this.container_fg.style.transform = "translate(0px, 0px)";
             }
         }
     }

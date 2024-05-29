@@ -39,7 +39,8 @@
         { "imports": { "three": "../node_modules/three/build/three.module.js" } }
     </script>
 
-    <div id="appbody" style="position: fixed;z-index: -100; width: 100%; height: 100%; top: 0; left: 0; right: 0; bottom: 0;"></div>
+    <div id="appbody-bg" style="position: fixed;z-index: -100; width: 100%; height: 100%; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none;"></div>
+    <div id="appbody-fg" style="position: fixed;z-index: 100; width: 100%; height: 100%; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none;"></div>
     <script type="module" src="./src/main.js"></script>
 
     <!-- Primary Page Layout

@@ -8,7 +8,8 @@ export default class World {
 
     /** **INTERNAL**: Set up a basic world */
     _setupWorld(mainObject) {
-        this.container = document.getElementById('appbody');
+        this.container_bg = document.getElementById('appbody-bg');
+        this.container_fg = document.getElementById('appbody-fg');
         
         // camera and world
         this.scene = new THREE.Scene();
@@ -18,16 +19,7 @@ export default class World {
         this.camera.layers.enableAll();
         this.scene.add(this.camera);
 
-        this.camera.updateMatrixWorld();
-        this.camera.updateProjectionMatrix();
-
-        // Calculate the camera movement required to follow the scroll
-        this.derp = new THREE.Vector3(0.0, 0.0, 0.0);
-        this.derp.project(this.camera);
-        this.derp.y = 1.0/window.innerHeight;
-        this.derp.unproject(this.camera);
-        this.movementPerPixel = this.derp.y * 2.0;
-        console.log(this.movementPerPixel);
+        this._recomputePixelsPerMeter();
 
         this.spotLight = new THREE.SpotLight( 0xffffff, Math.PI * 10.0 );
         this.spotLight.angle = Math.PI / 5;
@@ -81,16 +73,27 @@ export default class World {
         this.helper3.position.set(0, -10.0, 0);
         this.scene.add( this.helper3 );
 
+        this.renderingMode = 2;
+
         // renderer
-        this.renderer = new THREE.WebGLRenderer( { antialias: true } ); //, alpha: true
-        this.renderer.setPixelRatio( Math.max(window.devicePixelRatio, 1));
-        this.renderer.shadowMap.enabled = true;
-        this.container.appendChild(this.renderer.domElement);
-        this.renderer.setAnimationLoop(mainObject.update.bind(mainObject));
-        this.renderer.setClearColor( 0x000000, 0 ); // the default
+        this.renderer_bg = new THREE.WebGLRenderer( { antialias: true } ); //, alpha: true
+        this.renderer_bg.setPixelRatio( Math.max(window.devicePixelRatio, 1));
+        this.renderer_bg.shadowMap.enabled = true;
+        this.renderer_bg.setAnimationLoop(mainObject.update.bind(mainObject));
+        this.renderer_bg.setClearColor( 0x000000, 0 ); // the default
+
+        this.renderer_fg = new THREE.WebGLRenderer( { antialias: true } ); //, alpha: true
+        this.renderer_fg.setPixelRatio( Math.max(window.devicePixelRatio, 1));
+        this.renderer_fg.shadowMap.enabled = true;
+        //this.renderer_fg.setAnimationLoop(mainObject.update.bind(mainObject));
+        this.renderer_fg.setClearColor( 0x000000, 0 ); // the default
+
         window.addEventListener('resize', this._onWindowResize.bind(this), false);
         window.addEventListener('orientationchange', this._onWindowResize.bind(this), false);
         this._onWindowResize();
+
+        this.container_bg.appendChild(this.renderer_bg.domElement);
+        this.container_fg.appendChild(this.renderer_fg.domElement);
 
         // raycaster
         this.raycaster = new THREE.Raycaster();
@@ -98,7 +101,48 @@ export default class World {
 
         // stats
         this.stats = new Stats();
-        this.container.appendChild(this.stats.dom);
+        this.container_bg.appendChild(this.stats.dom);
+    }
+
+    _render() {
+        if(this.renderingMode  == 2){
+            this.camera.near = 5.0;
+            this.camera.far = 1000;
+            this.camera.updateProjectionMatrix();
+            this.renderer_bg.render(this.scene, this.camera);
+
+            this.camera.near = 2.0;
+            this.camera.far  = 5.01;
+            this.camera.updateProjectionMatrix();
+            this.renderer_fg.render(this.scene, this.camera);
+        }else{
+            this.camera.near = 2.0;
+            this.camera.far = 1000;
+            this.camera.updateProjectionMatrix();
+            if(this.renderingMode == 0){
+                this.renderer_bg.render(this.scene, this.camera);
+                this.renderer_fg.clear();
+            }else{
+                this.renderer_bg.clear();
+                this.renderer_fg.render(this.scene, this.camera);
+            }
+        }
+    }
+
+    _recomputePixelsPerMeter(){
+        // Calculate the camera movement required to follow the scroll
+        let oldPosition = this.camera.position.clone();
+        this.camera.position.set(0.0, 0.0, 5.0);
+        this.camera.updateMatrixWorld();
+        this.camera.updateProjectionMatrix();
+        this.derp = new THREE.Vector3(0.0, 0, 0.0);
+        this.derp.project(this.camera);
+        this.derp.y = 1.0/window.innerHeight;
+        this.derp.unproject(this.camera);
+        this.pixelsPerMeter = 1.0 / (this.derp.y * 2.0);
+        this.camera.position.copy(oldPosition);
+        this.camera.updateMatrixWorld();
+        this.camera.updateProjectionMatrix();
     }
 
     /** **INTERNAL**: This function recalculates the viewport based on the new window size. */
@@ -107,10 +151,12 @@ export default class World {
         if(this.lastWidth != width || this.lastHeight != height){
             this.camera.aspect = width / height;
             this.camera.updateProjectionMatrix();
-            this.renderer.setSize(width, height);
-            this.renderer.render(this.scene, this.camera);
+            this.renderer_bg.setSize(width, height);
+            this.renderer_fg.setSize(width, height);
+            this._render();
             this.lastWidth  = width;
             this.lastHeight = height;
+            this._recomputePixelsPerMeter();
         }
     }
 

@@ -19,21 +19,19 @@ export default class Main {
     }
     async deferredConstructor() {
         // Configure Settings
-        this.meshingParams = {
-            RemeshResolution : 20,
-            TargetTriangles  : 2000,
-            MaxTriangleEdgeLength: 50.0,
-            MinTetVolume: 0.01,
-            ShowTetMesh      : true,
+        this.overlayParams = {
+            renderingMode: 2
         };
-        //this.gui = new GUI();
-        //this.gui.add(this.meshingParams, 'RemeshResolution', 0, 50, 1).onFinishChange((value) => {
+        this.gui = new GUI();
+        this.gui.add( this.overlayParams, 'renderingMode', { Background: 0, Foreground: 1, ForegroundAndBackground: 2 } )
+            .onFinishChange((value) => { this.world.renderingMode = value; });
+        //this.gui.add(this.overlayParams, 'RemeshResolution', 0, 50, 1).onFinishChange((value) => {
         //    if(this.mesh){ this.generateTetMesh(this.mesh); }});
-        //this.gui.add(this.meshingParams, 'TargetTriangles', 100, 5000, 100).onFinishChange((value) => {
+        //this.gui.add(this.overlayParams, 'TargetTriangles', 100, 5000, 100).onFinishChange((value) => {
         //    if(this.mesh){ this.generateTetMesh(this.mesh); }});
-        //this.gui.add(this.meshingParams, 'MaxTriangleEdgeLength').onFinishChange((value) => {
+        //this.gui.add(this.overlayParams, 'MaxTriangleEdgeLength').onFinishChange((value) => {
         //    if(this.mesh){ this.generateTetMesh(this.mesh); }});
-        //this.gui.add(this.meshingParams, 'MinTetVolume').onFinishChange((value) => {
+        //this.gui.add(this.overlayParams, 'MinTetVolume').onFinishChange((value) => {
         //    if(this.mesh){ this.generateTetMesh(this.mesh); }});
 
         // Construct the render world
@@ -46,8 +44,8 @@ export default class Main {
         this.alreadyRendered = false;
 
         window.addEventListener("scroll", (event) => {
-            this.world.camera.position.set(0.0, -window.scrollY * this.world.movementPerPixel, 5.0);
-            this.world.renderer.render(this.world.scene, this.world.camera);
+            this.world.camera.position.set(0.0, -window.scrollY / this.world.pixelsPerMeter, 5.0);
+            this.world._render(this.world.scene, this.world.camera);
             this.alreadyRendered = true;
         });
     }
@@ -55,7 +53,7 @@ export default class Main {
     /** Update the simulation */
     update() {
         if(this.alreadyRendered){ this.alreadyRendered = false; return; }
-        this.world.renderer.render(this.world.scene, this.world.camera);
+        this.world._render(this.world.scene, this.world.camera);
         this.world.stats.update();
     }
 

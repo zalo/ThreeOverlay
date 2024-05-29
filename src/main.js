@@ -45,7 +45,7 @@ export default class Main {
     /** Update the simulation */
     update() {
         if(this.world.alreadyRendered){ this.world.alreadyRendered = false; return; }
-        this.world._render(this.world.scene, this.world.camera);
+        this.world._setScroll(false);
         this.world.stats.update();
     }
 

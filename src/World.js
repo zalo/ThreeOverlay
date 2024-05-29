@@ -77,13 +77,13 @@ export default class World {
 
         // renderer
         this.renderer_bg = new THREE.WebGLRenderer( { antialias: true } ); //, alpha: true
-        this.renderer_bg.setPixelRatio( Math.max(window.devicePixelRatio, 1));
+        this.renderer_bg.setPixelRatio(window.devicePixelRatio > 1.5 ? 0.5 : 1.0);
         this.renderer_bg.shadowMap.enabled = true;
         this.renderer_bg.setAnimationLoop(mainObject.update.bind(mainObject));
         this.renderer_bg.setClearColor( 0x000000, 0 ); // the default
 
         this.renderer_fg = new THREE.WebGLRenderer( { antialias: true } ); //, alpha: true
-        this.renderer_fg.setPixelRatio( Math.max(window.devicePixelRatio, 1));
+        this.renderer_fg.setPixelRatio(window.devicePixelRatio > 1.5 ? 0.5 : 1.0);
         this.renderer_fg.shadowMap.enabled = true;
         //this.renderer_fg.setAnimationLoop(mainObject.update.bind(mainObject));
         this.renderer_fg.setClearColor( 0x000000, 0 ); // the default
@@ -140,10 +140,10 @@ export default class World {
         }
     }
 
-    _setScroll(){
+    _setScroll(interruption = true){
         this.camera.position.set(0.0, -(window.scrollY + (window.innerHeight *0.5)) / this.pixelsPerMeter, 5.0);
         this._render(this.scene, this.camera);
-        this.alreadyRendered = true;
+        this.alreadyRendered = interruption;
     }
 
     _recomputeElementBoxes(){

@@ -6,8 +6,7 @@
     "include": ["src/**/*"],
     "typeAcquisition": {
         "include": [
-            "three",
-            "manifold-3d"
+            "three"
         ]
     }
 }

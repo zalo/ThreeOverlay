@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Basic Page Needs
+    –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <meta charset="utf-8">
+    <title>ThreeOverlay Demo</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="application-name"   content="ThreeOverlay Demo">
+    <meta name="description"        content="A demonstration of the three overlay system.">
+    <meta name="keywords"           content="Overlay, Three">
+    <meta name="author"             content="Johnathon Selstad">
+    <meta name="viewport"           content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover, user-scalable=0, shrink-to-fit=0">
+    <meta name="theme-color"        content="#ffffff">
+
+    <!-- Mobile Specific Metas
+    –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- FONT
+    –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <link href="//fonts.googleapis.com/css?family=Raleway:400,300,600" rel="stylesheet" type="text/css">
+
+    <!-- CSS
+    –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <link rel="stylesheet" href="assets/normalize.css">
+    <link rel="stylesheet" href="assets/skeleton.css">
+
+    <!-- Favicon
+    –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <link rel="icon" type="image/png" href="images/favicon.png">
+  </head>
+
+  <body style="margin:0px; background-color:rgb(255, 255, 255);">
+    <h1 hidden></h1> <!-- Puts the Lighthouse Score over 90 heheh-->
+
+    <!-- Allows three.js Examples to work without building -->
+    <script type="importmap">
+        { "imports": { "three": "../node_modules/three/build/three.module.js" } }
+    </script>
+
+    <div id="appbody" style="position: fixed;z-index: -100; width: 100%; height: 100%; top: 0; left: 0; right: 0; bottom: 0;"></div>
+    <script type="module" src="./src/main.js"></script>
+
+    <!-- Primary Page Layout
+    –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <div class="container">
+      <div class="row">
+        <div class="column" style="margin-top: 2.5%">
+          <h1><a id="ThreeOverlay"></a>ThreeOverlay Demo</h1>
+          <p>ThreeOverlay is a system that overlays a 3D rendering canvas onto web pages.<br>
+          <h5><a id="Instructions"></a>Instructions</h5>
+          <p>Download the template and modify it to create your ideal webpage ornaments and buddies.</p>
+          <h5><a id="How_it_works"></a>How it works</h5>
+          <p>ThreeOverlay creates a transparent canvas that spans your webpage, allowing you to render dynamic 3D elements inline with your text.</p>
+          <p>Specific locations and features of your page will be injected into the 3D space as interactable elements via a bidirectional mapping.</p>
+          <h5><a id="Keymappings"></a>Keymappings</h5>
+          <table class="u">
+            <thead>
+              <tr>
+                <th>Controller Button</th>
+                <th>Keypress</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Up</td>
+                <td><code>w</code></td>
+              </tr>
+              <tr>
+                <td>Left</td>
+                <td><code>a</code></td>
+              </tr>
+              <tr>
+                <td>Down</td>
+                <td><code>s</code></td>
+              </tr>
+              <tr>
+                <td>Right</td>
+                <td><code>d</code></td>
+              </tr>
+              <tr>
+                <td>A</td>
+                <td><code>Space</code></td>
+              </tr>
+              <tr>
+                <td>B</td>
+                <td><code>Shift</code></td>
+              </tr>
+              <tr>
+                <td>Start</td>
+                <td><code>Enter</code></td>
+              </tr>
+            </tbody>
+          </table>
+          <p>These keymappings can be changed by clicking on the player's name above the QR Code, and are stored locally on a per-page basis.</p>
+          <h5><a id="Open_Source" href="https://github.com/zalo/ThreeOverlay"></a>Open Source</h5>
+          <p><a href="https://github.com/zalo/ThreeOverlay">The source code to ThreeOverlay is available under the MIT License at Github.</a></p>
+          <h5><a id="Credits" href=""></a>Credits</h5>
+          <p>ThreeOverlay is based on <a href="https://threejs.org/">three.js</a>, and <a href="http://getskeleton.com/">Skeleton.css</a>.</p>
+          <h5><a id="Debug_Event_Stream"></a>Raw Events</h5>
+          <pre class="code-example"><code class="code-example-body prettyprint" id="ctrlJsEvents">ThreeOverlay Events will appear here upon connection.</code></pre>
+      </div>
+    </div>
+  </div>
+  <!-- End Document
+    –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  </body>
+</html>

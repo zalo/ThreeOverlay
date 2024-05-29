@@ -49,29 +49,13 @@ export default class World {
         
         // Geometry
 
-        this.helper0 = new THREE.GridHelper( 20, 20 );
-        this.helper0.material.opacity = 0.2;
-        this.helper0.material.transparent = true;
-        this.helper0.position.set(0, 5.0, 0);
-        this.scene.add( this.helper0 );
-
-        this.helper = new THREE.GridHelper( 20, 20 );
-        this.helper.material.opacity = 0.2;
-        this.helper.material.transparent = true;
-        this.helper.position.set(0, 0.0, 0);
-        this.scene.add( this.helper );
-
-        this.helper2 = new THREE.GridHelper( 20, 20 );
-        this.helper2.material.opacity = 0.2;
-        this.helper2.material.transparent = true;
-        this.helper2.position.set(0, -5.0, 0);
-        this.scene.add( this.helper2 );
-
-        this.helper3 = new THREE.GridHelper( 20, 20 );
-        this.helper3.material.opacity = 0.2;
-        this.helper3.material.transparent = true;
-        this.helper3.position.set(0, -10.0, 0);
-        this.scene.add( this.helper3 );
+        for(let i = 0; i < 10; i++){
+            this.helper0 = new THREE.GridHelper( 20, 20 );
+            this.helper0.material.opacity = 0.2;
+            this.helper0.material.transparent = true;
+            this.helper0.position.set(0, i * -5.0, 0);
+            this.scene.add( this.helper0 );
+        }
 
         this.renderingMode = 2;
 
@@ -105,14 +89,16 @@ export default class World {
         window.addEventListener("scroll", (event) => { this.scrollQueue.unshift(window.scrollY); });
 
         // stats
-        this.stats = new Stats();
-        this.container_bg.appendChild(this.stats.dom);
+        //this.stats = new Stats();
+        //this.container_bg.appendChild(this.stats.dom);
 
         this.boxGeometry = new THREE.BoxGeometry(1, 1, 1)
         this.elementMaterial = new THREE.MeshPhysicalMaterial({ color: 0xffffff, wireframe: true, opacity: 0.05, transparent: true});
 
         this.elementBoxes = [];
-        this._recomputeElementBoxes();
+        //this._recomputeElementBoxes();
+
+        this.camera.position.set(0.0, -(this.curScrollY + (window.innerHeight * 0.5)) / this.pixelsPerMeter, 5.0);
     }
 
     _render() {
@@ -195,7 +181,7 @@ export default class World {
             this.lastWidth  = width;
             this.lastHeight = height;
             this._recomputePixelsPerMeter();
-            this._recomputeElementBoxes();
+            //this._recomputeElementBoxes();
         }
         this._setScroll();
     }

@@ -45,7 +45,7 @@ export default class Main {
     /** Update the simulation */
     update(timeMS) {
         this.world._setScroll(timeMS);
-        this.world.stats.update();
+        //this.world.stats.update();
     }
 
     // Log Errors as <div>s over the main viewport

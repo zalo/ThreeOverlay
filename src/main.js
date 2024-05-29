@@ -43,17 +43,18 @@ export default class Main {
         this.cube.position.set(0.0, 0.0, 0.0);
         this.world.scene.add(this.cube);
 
+        this.alreadyRendered = false;
+
         window.addEventListener("scroll", (event) => {
-            this.world.camera.position.set(0.0, window.scrollY/100.0, 5.0);
+            this.world.camera.position.set(0.0, -window.scrollY * this.world.movementPerPixel, 5.0);
+            this.world.renderer.render(this.world.scene, this.world.camera);
+            this.alreadyRendered = true;
         });
     }
 
     /** Update the simulation */
     update() {
-        //this.world.controls.update();
-        //console.log(window.scrollY);
-        this.world.camera.position.set(0.0, -window.scrollY/100.0, 5.0);
-
+        if(this.alreadyRendered){ this.alreadyRendered = false; return; }
         this.world.renderer.render(this.world.scene, this.world.camera);
         this.world.stats.update();
     }

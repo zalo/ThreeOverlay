@@ -1,6 +1,5 @@
 import * as THREE from '../node_modules/three/build/three.module.js';
 import Stats from '../node_modules/three/examples/jsm/libs/stats.module.js';
-import { OrbitControls } from '../node_modules/three/examples/jsm/controls/OrbitControls.js';
 
 /** The fundamental set up and animation structures for 3D Visualization */
 export default class World {
@@ -9,17 +8,26 @@ export default class World {
 
     /** **INTERNAL**: Set up a basic world */
     _setupWorld(mainObject) {
-        // app container div
         this.container = document.getElementById('appbody');
         
         // camera and world
         this.scene = new THREE.Scene();
-        //this.scene.background = new THREE.Color(0, 0, 0, 0);
 
-        this.camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1.0, 1000 );
-        this.camera.position.set( 0.0, 1, -2 );
+        this.camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 2.0, 1000 );
+        this.camera.position.set( 0.0, 0.0, 5.0 );
         this.camera.layers.enableAll();
         this.scene.add(this.camera);
+
+        this.camera.updateMatrixWorld();
+        this.camera.updateProjectionMatrix();
+
+        // Calculate the camera movement required to follow the scroll
+        this.derp = new THREE.Vector3(0.0, 0.0, 0.0);
+        this.derp.project(this.camera);
+        this.derp.y = 1.0/window.innerHeight;
+        this.derp.unproject(this.camera);
+        this.movementPerPixel = this.derp.y * 2.0;
+        console.log(this.movementPerPixel);
 
         this.spotLight = new THREE.SpotLight( 0xffffff, Math.PI * 10.0 );
         this.spotLight.angle = Math.PI / 5;
@@ -49,15 +57,12 @@ export default class World {
         
         // Geometry
 
-        this.ground = new THREE.Mesh(
-            new THREE.PlaneGeometry( 20, 20, 1, 1 ),
-            new THREE.MeshPhongMaterial( { color: 0xa0adaf, shininess: 150 } )
-        );				
+        this.helper0 = new THREE.GridHelper( 20, 20 );
+        this.helper0.material.opacity = 0.2;
+        this.helper0.material.transparent = true;
+        this.helper0.position.set(0, 5.0, 0);
+        this.scene.add( this.helper0 );
 
-        //this.ground.rotation.x = - Math.PI / 2; // rotates X/Y to X/Z
-        //this.ground.receiveShadow = true;
-        //this.scene.add( this.ground );
-        
         this.helper = new THREE.GridHelper( 20, 20 );
         this.helper.material.opacity = 0.2;
         this.helper.material.transparent = true;
@@ -78,25 +83,14 @@ export default class World {
 
         // renderer
         this.renderer = new THREE.WebGLRenderer( { antialias: true } ); //, alpha: true
-        this.renderer.setPixelRatio( window.devicePixelRatio );
+        this.renderer.setPixelRatio( Math.max(window.devicePixelRatio, 1));
         this.renderer.shadowMap.enabled = true;
         this.container.appendChild(this.renderer.domElement);
         this.renderer.setAnimationLoop(mainObject.update.bind(mainObject));
-        this.renderer.setClearColor( 0x35363e, 0 ); // the default
+        this.renderer.setClearColor( 0x000000, 0 ); // the default
         window.addEventListener('resize', this._onWindowResize.bind(this), false);
         window.addEventListener('orientationchange', this._onWindowResize.bind(this), false);
         this._onWindowResize();
-
-        //this.draggableObjects = [];
-        //this.controls = new OrbitControls(this.camera, this.renderer.domElement);
-        //this.controls.target.set(0, 1, 0);
-        //this.controls.panSpeed = 2;
-        //this.controls.zoomSpeed = 1;
-        //this.controls.enableDamping = true;
-        //this.controls.dampingFactor = 0.10;
-        //this.controls.screenSpacePanning = true;
-        //this.controls.update();
-        //this.controls.addEventListener('change', () => this.viewDirty = true);
 
         // raycaster
         this.raycaster = new THREE.Raycaster();
@@ -104,29 +98,20 @@ export default class World {
 
         // stats
         this.stats = new Stats();
-        this.stats.dom.style.transform = "scale(0.7);";
         this.container.appendChild(this.stats.dom);
-
-        // Temp variables to reduce allocations
-        this.mat  = new THREE.Matrix4();
-        this.vec = new THREE.Vector3();
-        this.zVec = new THREE.Vector3(0, 0, 1);
-        this.quat = new THREE.Quaternion().identity();
-        this.color = new THREE.Color();
-
     }
 
     /** **INTERNAL**: This function recalculates the viewport based on the new window size. */
     _onWindowResize() {
         let width = window.innerWidth, height = window.innerHeight;
-        this.camera.aspect = width / height;
-        this.camera.updateProjectionMatrix();
-        if (this.webcamera) {
-            this.webcamera.camera.aspect = width / height;
-            this.webcamera.camera.updateProjectionMatrix();
+        if(this.lastWidth != width || this.lastHeight != height){
+            this.camera.aspect = width / height;
+            this.camera.updateProjectionMatrix();
+            this.renderer.setSize(width, height);
+            this.renderer.render(this.scene, this.camera);
+            this.lastWidth  = width;
+            this.lastHeight = height;
         }
-        this.renderer.setSize(width, height);
-        this.renderer.render(this.scene, this.camera);
     }
 
 }

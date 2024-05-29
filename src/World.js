@@ -99,9 +99,20 @@ export default class World {
         this.raycaster = new THREE.Raycaster();
         this.raycaster.layers.set(0);
 
+        this.alreadyRendered = false;
+        window.addEventListener("scroll", (event) => {
+            this._setScroll();
+        });
+
         // stats
         this.stats = new Stats();
         this.container_bg.appendChild(this.stats.dom);
+
+        this.boxGeometry = new THREE.BoxGeometry(1, 1, 1)
+        this.elementMaterial = new THREE.MeshPhysicalMaterial({ color: 0xffffff, wireframe: true, opacity: 0.05, transparent: true});
+
+        this.elementBoxes = [];
+        this._recomputeElementBoxes();
     }
 
     _render() {
@@ -129,6 +140,30 @@ export default class World {
         }
     }
 
+    _setScroll(){
+        this.camera.position.set(0.0, -(window.scrollY + (window.innerHeight *0.5)) / this.pixelsPerMeter, 5.0);
+        this._render(this.scene, this.camera);
+        this.alreadyRendered = true;
+    }
+
+    _recomputeElementBoxes(){
+        if(!this.elementBoxes){ this.elementBoxes = []; }
+
+        let elements = document.getElementsByTagName('p');
+        for(let i = 0; i < elements.length; i++){
+            if(i >= this.elementBoxes.length){
+                let cube = new THREE.Mesh(this.boxGeometry, this.elementMaterial);
+                this.scene.add(cube);
+                this.elementBoxes.push(cube);
+            }
+
+            let rect = elements[i].getBoundingClientRect();
+            this.elementBoxes[i].position.set(0.0, (rect.top + window.scrollY + (rect.height * 0.5)) / -this.pixelsPerMeter, 0.0);
+            this.elementBoxes[i].scale.set(rect.width / this.pixelsPerMeter, rect.height / this.pixelsPerMeter, 0.5);
+            this.elementBoxes[i].element = elements[i];
+        }
+    }
+
     _recomputePixelsPerMeter(){
         // Calculate the camera movement required to follow the scroll
         let oldPosition = this.camera.position.clone();
@@ -153,11 +188,12 @@ export default class World {
             this.camera.updateProjectionMatrix();
             this.renderer_bg.setSize(width, height);
             this.renderer_fg.setSize(width, height);
-            this._render();
             this.lastWidth  = width;
             this.lastHeight = height;
             this._recomputePixelsPerMeter();
+            this._recomputeElementBoxes();
         }
+        this._setScroll();
     }
 
 }

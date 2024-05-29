@@ -38,21 +38,13 @@ export default class Main {
         this.world = new World(this);
 
         this.cube = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshPhysicalMaterial({ color: 0x00ff00, wireframe: false }));
-        this.cube.position.set(0.0, 0.0, 0.0);
+        this.cube.position.set(0.0, -5.0, 0.0);
         this.world.scene.add(this.cube);
-
-        this.alreadyRendered = false;
-
-        window.addEventListener("scroll", (event) => {
-            this.world.camera.position.set(0.0, -window.scrollY / this.world.pixelsPerMeter, 5.0);
-            this.world._render(this.world.scene, this.world.camera);
-            this.alreadyRendered = true;
-        });
     }
 
     /** Update the simulation */
     update() {
-        if(this.alreadyRendered){ this.alreadyRendered = false; return; }
+        if(this.world.alreadyRendered){ this.world.alreadyRendered = false; return; }
         this.world._render(this.world.scene, this.world.camera);
         this.world.stats.update();
     }

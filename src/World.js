@@ -1,5 +1,4 @@
 import * as THREE from '../node_modules/three/build/three.module.js';
-import Stats from '../node_modules/three/examples/jsm/libs/stats.module.js';
 
 /** The fundamental set up and animation structures for 3D Visualization */
 export default class World {
@@ -16,7 +15,8 @@ export default class World {
         this.camera.layers.enableAll();
         this.scene.add(this.camera);
 
-        this._recomputePixelsPerMeter();
+        this.forcedPixelsPerMeter = 100.0;
+        this._forcePixelsPerMeter();
 
         this.spotLight = new THREE.SpotLight( 0xffffff, Math.PI * 10.0 );
         this.spotLight.angle = Math.PI / 5;
@@ -50,7 +50,7 @@ export default class World {
             this.helper0 = new THREE.GridHelper( 20, 20 );
             this.helper0.material.opacity = 0.2;
             this.helper0.material.transparent = true;
-            this.helper0.position.set(0, i * -5.0, 0);
+            this.helper0.position.set((window.innerWidth * 0.5) / this.pixelsPerMeter, i * -5.0, 0);
             this.scene.add( this.helper0 );
         }
 
@@ -90,8 +90,11 @@ export default class World {
 
         this.elementBoxes = [];
         this._recomputeElementBoxes();
-
         this._setScroll();
+
+        this.cube = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshPhysicalMaterial({ color: 0x00ff00, wireframe: false }));
+        this.cube.position.set((window.innerWidth * 0.5) / this.pixelsPerMeter, -5.0, 0.0);
+        this.scene.add(this.cube);
     }
 
 
@@ -130,7 +133,7 @@ export default class World {
     _setScroll(){
         this.curScrollX = window.scrollX;
         this.curScrollY = window.scrollY;
-        this.camera.position.set( (this.curScrollX) / this.pixelsPerMeter,
+        this.camera.position.set( (this.curScrollX + (window.innerWidth * 0.5)) / this.pixelsPerMeter,
                                  -(this.curScrollY + (window.innerHeight * 0.5)) / this.pixelsPerMeter, 5.0); // - (window.innerWidth  * 0.5)
 
         this._render(this.scene, this.camera);
@@ -159,7 +162,9 @@ export default class World {
             }
 
             let rect = elements[i].getBoundingClientRect();
-            this.elementBoxes[i].position.set(0.0, (rect.top + window.scrollY + (rect.height * 0.5)) / -this.pixelsPerMeter, 0.0);
+            this.elementBoxes[i].position.set(
+                (rect.left + window.scrollX + (rect.width  * 0.5)) /  this.pixelsPerMeter,
+                (rect.top  + window.scrollY + (rect.height * 0.5)) / -this.pixelsPerMeter, 0.0);
             this.elementBoxes[i].scale.set(rect.width / this.pixelsPerMeter, rect.height / this.pixelsPerMeter, 0.5);
             this.elementBoxes[i].element = elements[i];
         }
@@ -175,10 +180,19 @@ export default class World {
         this.derp.project(this.camera);
         this.derp.y = 1.0/window.innerHeight;
         this.derp.unproject(this.camera);
-        this.pixelsPerMeter = 1.0 / (this.derp.y * 2.0);
         this.camera.position.copy(oldPosition);
         this.camera.updateMatrixWorld();
         this.camera.updateProjectionMatrix();
+        this.pixelsPerMeter = 1.0 / (this.derp.y * 2.0);
+        return this.pixelsPerMeter;
+    }
+
+    _forcePixelsPerMeter(){
+        for(let i = 0; i < 10; i++){
+            let curPixelsPerMeter = this._recomputePixelsPerMeter();
+            this.camera.fov *= curPixelsPerMeter / this.forcedPixelsPerMeter;
+            this.camera.updateProjectionMatrix();
+        }
     }
 
     /** **INTERNAL**: This function recalculates the viewport based on the new window size. */
@@ -191,7 +205,7 @@ export default class World {
             this.renderer_fg.setSize(width, height);
             this.lastWidth  = width;
             this.lastHeight = height;
-            this._recomputePixelsPerMeter();
+            this._forcePixelsPerMeter();
             this._recomputeElementBoxes();
         }
         this._setScroll();

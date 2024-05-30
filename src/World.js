@@ -80,26 +80,10 @@ export default class World {
         this.raycaster = new THREE.Raycaster();
         this.raycaster.layers.set(0);
 
-        //let iOS = [
-        //    'iPad Simulator',
-        //    'iPhone Simulator',
-        //    'iPod Simulator',
-        //    'iPad',
-        //    'iPhone',
-        //    'iPod'
-        //  ].includes(navigator.platform)
-        //  // iPad on iOS 13 detection
-        //  || (navigator.userAgent.includes("Mac") && "ontouchend" in document);
-
         // Enqueue Scroll Events, since sometimes multiple scroll events are fired in a single frame
         this.scrollQueue = [];
         this.curScrollY = window.scrollY;
-        this.positioningMode = 1;//iOS ? 1 : 0; // 0 is Fixed, 1 is Absolute
-        //window.addEventListener("scroll", (event) => { this.scrollQueue.unshift(window.scrollY); });
-
-        // stats
-        //this.stats = new Stats();
-        //this.container_bg.appendChild(this.stats.dom);
+        this.positioningMode = 1; // 0 is Fixed, 1 is Absolute
 
         this.boxGeometry = new THREE.BoxGeometry(1, 1, 1)
         this.elementMaterial = new THREE.MeshPhysicalMaterial({ color: 0xffffff, wireframe: true, opacity: 0.05, transparent: true});
@@ -107,11 +91,18 @@ export default class World {
         this.elementBoxes = [];
         this._recomputeElementBoxes();
 
-        this.camera.position.set(0.0, -(this.curScrollY + (window.innerHeight * 0.5)) / this.pixelsPerMeter, 5.0);
+        this._setScroll();
     }
 
 
     _render() {
+        // Trigger a resize event if the window size has changed
+        // iOS Pinch to Zoom does not trigger a resize event
+        if( window.innerWidth  != this.lastWidth || 
+            window.innerHeight != this.lastHeight){
+            this._onWindowResize();
+        }
+
         if(this.renderingMode  == 2){
             this.camera.near = 5.0;
             this.camera.far = 1000;
@@ -137,23 +128,22 @@ export default class World {
     }
 
     _setScroll(){
-        if(this.scrollQueue){
-            //if(this.scrollQueue.length > 0) {
-                this.curScrollY = window.scrollY;//this.scrollQueue.pop();
-                this.camera.position.set(0.0, -(this.curScrollY + (window.innerHeight * 0.5)) / this.pixelsPerMeter, 5.0);
-            //}
-            this._render(this.scene, this.camera);
-            if(this.positioningMode == 1){
-                this.container_bg.style.position = "absolute";
-                this.container_fg.style.position = "absolute";
-                this.container_bg.style.transform = "translate(0px, "+this.curScrollY+"px)";
-                this.container_fg.style.transform = "translate(0px, "+this.curScrollY+"px)";
-            }else{
-                this.container_bg.style.position = "fixed";
-                this.container_fg.style.position = "fixed";
-                this.container_bg.style.transform = "translate(0px, 0px)";
-                this.container_fg.style.transform = "translate(0px, 0px)";
-            }
+        this.curScrollX = window.scrollX;
+        this.curScrollY = window.scrollY;
+        this.camera.position.set( (this.curScrollX) / this.pixelsPerMeter,
+                                 -(this.curScrollY + (window.innerHeight * 0.5)) / this.pixelsPerMeter, 5.0); // - (window.innerWidth  * 0.5)
+
+        this._render(this.scene, this.camera);
+        if(this.positioningMode == 1){
+            this.container_bg.style.position = "absolute";
+            this.container_fg.style.position = "absolute";
+            this.container_bg.style.transform = "translate("+this.curScrollX+"px, "+this.curScrollY+"px)";
+            this.container_fg.style.transform = "translate("+this.curScrollX+"px, "+this.curScrollY+"px)";
+        }else{
+            this.container_bg.style.position = "fixed";
+            this.container_fg.style.position = "fixed";
+            this.container_bg.style.transform = "translate(0px, 0px)";
+            this.container_fg.style.transform = "translate(0px, 0px)";
         }
     }
 

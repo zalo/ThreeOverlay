@@ -10,12 +10,15 @@ export default class World {
         // camera and world
         this.scene = new THREE.Scene();
 
-        this.camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 2.0, 1000 );
-        this.camera.position.set( 0.0, 0.0, 5.0 );
+        this.forcedPixelsPerMeter = 100.0;
+        this.cameraDepth          = 5.0;
+        this.cameraFoV            = 60.0;
+
+        this.camera = new THREE.PerspectiveCamera( this.cameraFoV, window.innerWidth / window.innerHeight, 2.0, 1000 );
+        this.camera.position.set( 0.0, 0.0, this.cameraDepth );
         this.camera.layers.enableAll();
         this.scene.add(this.camera);
 
-        this.forcedPixelsPerMeter = 100.0;
         this._forcePixelsPerMeter();
 
         this.spotLight = new THREE.SpotLight( 0xffffff, Math.PI * 10.0 );
@@ -107,13 +110,13 @@ export default class World {
         }
 
         if(this.renderingMode  == 2){
-            this.camera.near = 5.0;
+            this.camera.near = this.cameraDepth;
             this.camera.far = 1000;
             this.camera.updateProjectionMatrix();
             this.renderer_bg.render(this.scene, this.camera);
 
             this.camera.near = 2.0;
-            this.camera.far  = 5.01;
+            this.camera.far  = this.cameraDepth + 0.01;
             this.camera.updateProjectionMatrix();
             this.renderer_fg.render(this.scene, this.camera);
         }else{
@@ -134,7 +137,7 @@ export default class World {
         this.curScrollX = window.scrollX;
         this.curScrollY = window.scrollY;
         this.camera.position.set( (this.curScrollX + (window.innerWidth * 0.5)) / this.pixelsPerMeter,
-                                 -(this.curScrollY + (window.innerHeight * 0.5)) / this.pixelsPerMeter, 5.0); // - (window.innerWidth  * 0.5)
+                                 -(this.curScrollY + (window.innerHeight * 0.5)) / this.pixelsPerMeter, this.cameraDepth); // - (window.innerWidth  * 0.5)
 
         this._render(this.scene, this.camera);
         if(this.positioningMode == 1){
@@ -173,7 +176,7 @@ export default class World {
     _recomputePixelsPerMeter(){
         // Calculate the camera movement required to follow the scroll
         let oldPosition = this.camera.position.clone();
-        this.camera.position.set(0.0, 0.0, 5.0);
+        this.camera.position.set(0.0, 0.0, this.cameraDepth);
         this.camera.updateMatrixWorld();
         this.camera.updateProjectionMatrix();
         this.derp = new THREE.Vector3(0.0, 0, 0.0);
@@ -190,6 +193,8 @@ export default class World {
     _forcePixelsPerMeter(){
         for(let i = 0; i < 10; i++){
             let curPixelsPerMeter = this._recomputePixelsPerMeter();
+            // This is more compelling, but breaks the near clipping plane when zoomed in...
+            //this.cameraDepth *= curPixelsPerMeter / this.forcedPixelsPerMeter;
             this.camera.fov *= curPixelsPerMeter / this.forcedPixelsPerMeter;
             this.camera.updateProjectionMatrix();
         }
